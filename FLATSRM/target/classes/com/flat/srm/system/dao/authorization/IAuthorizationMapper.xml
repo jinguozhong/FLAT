@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flat.srm.system.dao.authorization.IAuthorizationMapper" >
+	<select id="findAll" resultType="Authorization" parameterType="TzParams">
+		<!-- SELECT id,code,name,pId,state from cp_Permissions ORDER BY code -->
+		SELECT A.ID, A.NAME, A.CODE,A.pId
+		  FROM CP_PERMISSIONS A  
+	</select>
+	
+	<select id="finds" resultType="Authorization" parameterType="TzParams">
+		<!-- SELECT id,code,name,pId,state from cp_Permissions ORDER BY code -->
+		SELECT A.ID, A.NAME, A.CODE,A.pId
+		  FROM CP_PERMISSIONS A
+		  <if test="id!=null and id!=''">
+			 left JOIN ROLE_PERM B
+			    ON A.ID = B.PERMID
+		      <trim prefix="WHERE" prefixOverrides="AND | OR ">  
+					  B.ROLEID = #{id} 
+			  </trim>
+		  </if>   
+	</select>
+	
+		<!-- 如何批量插入表中没有主键需要设置useGeneratedKeys="false" -->
+	<insert id="save" useGeneratedKeys="false" parameterType="TzParams">
+		 INSERT INTO ROLE_PERM(roleid,permid) VALUES
+		<!--  (SELECT A.* FROM (
+			 <foreach collection="listString" item="param" index="index" separator="UNION ALL">
+			 	 SELECT 
+			 	  #{id},#{param}
+			 	 FROM DUAL
+			 </foreach>
+		 )A) -->
+		 <foreach collection="listString" item="param" index="index" separator=","> 
+			 	  (#{id},#{param}) 
+		 </foreach>
+		 
+	</insert>
+	
+	<delete id="delete">
+		delete from role_perm where roleid=#{0} 
+	</delete>	 
+</mapper>

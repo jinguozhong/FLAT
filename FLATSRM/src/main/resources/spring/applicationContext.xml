@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:task="http://www.springframework.org/schema/task" 
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+  http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+  http://www.springframework.org/schema/context
+  http://www.springframework.org/schema/context/spring-context-4.2.xsd
+  http://www.springframework.org/schema/aop
+  http://www.springframework.org/schema/aop/spring-aop-4.2.xsd 
+  http://www.springframework.org/schema/tx
+  http://www.springframework.org/schema/tx/spring-tx-4.2.xsd
+  http://www.springframework.org/schema/task    
+  http://www.springframework.org/schema/task/spring-task-4.2.xsd">
+
+	<!-- @Compoment这类型注解的类都是需要被扫描 说白就是：让Spring的ApplicationContext去加载和初始化所有加了注解的类，给实例化 
+		@Repository:数据层的dao @Service:service就是service @Controller:web比如：action和springmvc-controller类 -->
+	<!-- 打开spring的annotation的支持 -->
+    <context:annotation-config />  
+     <context:component-scan base-package="com.flat.srm" >
+    	<!-- 过滤掉控制层的注解  -->
+    	<context:exclude-filter type="annotation"
+    		 expression="org.springframework.stereotype.Controller"/>
+     </context:component-scan>    
+    
+	<!-- 引入数据的db资源文件 -->
+	 <bean class ="com.flat.srm.common.core.des.EncryptPropertyPlaceholderConfigurer"
+		p:location="classpath:db/db.properties" p:fileEncoding="utf-8" />
+		
+	<!-- 导入src目录下的jdbc.properties文件 -->
+	 <context:property-placeholder location="classpath:db/db.properties"/>
+		 
+	<!-- dbcp c3po proxy durid 都是为了一个数据连接的问题，建立一个连接池塘，这里池塘里面有链接对象。 供 jdbc hibernate 
+		mybatis springjdbctemplate去获取 -->
+	<!--数据库连接-->
+    <bean id="dataSourceMysql" class="com.alibaba.druid.pool.DruidDataSource"  init-method="init" destroy-method="close">
+    	<!-- 基本属性 url、user、password -->
+    	<property name="driverClassName" value="${db.driver}"></property> 
+	    <property name="url" value="${db.url}" />
+	    <property name="username" value="${db.username}"/>
+	    <property name="password" value="${db.password}"/>
+		<!-- 配置初始化大小、最小、最大 -->
+		<property name="initialSize"><value>10</value></property>
+	    <property name="maxActive"><value>100</value></property>
+	    <property name="minIdle"><value>20</value></property>
+	    <!-- 配置获取连接等待超时的时间 -->
+	    <property name="maxWait"><value>60000</value></property>
+	    <!-- 配置监控统计拦截的filters -->
+	    <property name="filters"><value>stat</value></property>
+		<!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+	    <property name="timeBetweenEvictionRunsMillis"><value>60000</value></property>
+	    <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+	    <property name="minEvictableIdleTimeMillis"><value>300000</value></property>
+ 	</bean> 
+ 	
+ 	 <!-- 动态配置数据源 -->  
+ 	<bean id="dynamicDataSource" class="com.flat.srm.common.datasource.DynamicDataSource">
+ 		<property name="targetDataSources">
+ 			<map key-type="java.lang.String">
+ 				<entry value-ref ="dataSourceMysql" key= "dataSourceMysql"></entry >   
+ 			</map>
+ 		</property>
+ 		 <!-- 默认使用的数据源 -->  
+ 		<property name="defaultTargetDataSource" ref="dataSourceMysql"></property>
+ 	</bean>
+ 	
+ 	<!-- mybatis配置 -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dynamicDataSource" />
+        <!-- 映射所有的sql对应的模块的xml文件 -->
+        <property name="mapperLocations" value="classpath:com/flat/srm/*/dao/*/*.xml"></property>  
+        <!-- 加载mybatis住配置文件 -->
+        <property name="configLocation" value="classpath:mybatis-config.xml"></property>
+    </bean> 
+    
+     <!--初始化mybatis的模板 ，如果使用mapper就可以不需要使用模板，和下面的二选一-->
+      
+	<!-- mybatis的mapper转换器 也就是说的接口，里面原理是采用的jdk的动态代理实现的-->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer" >  
+    	<property name="basePackage" value="com.flat.srm.*.dao"></property>  
+    	<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+  	</bean>  
+  	
+  	
+  	  <!--声明 我们的事物管理组件-->
+     <bean id="txManage" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dynamicDataSource"></property>
+     </bean>
+     <!--开启我们的  事务注解扫描-->
+     <!-- <tx:annotation-driven transaction-manager="txManage" proxy-target-class="true"/>  -->
+     
+      <!--XML的配置 事物的方式-->
+      <tx:advice id="txAdvice" transaction-manager="txManage">
+         <tx:attributes>
+            <tx:method name="find*" propagation="REQUIRED"/>
+            <tx:method name="add*" propagation="REQUIRED"/>
+            <tx:method name="update*" propagation="REQUIRED"/>
+            <tx:method name="delete*" propagation="REQUIRED"/>
+            <tx:method name="save*" propagation="REQUIRED" rollback-for="java.lang.Exception"/>
+         </tx:attributes>
+      </tx:advice> 
+    <!--要用切面的方式给他配置进去-->
+   <aop:config proxy-target-class="true">
+        <aop:advisor advice-ref="txAdvice" pointcut="within(com.flat.srm.*.service..*)"/>
+   </aop:config>
+    
+  
+    <!-- 验证码 -->
+    <bean id="captchaProducer" class="com.google.code.kaptcha.impl.DefaultKaptcha">  
+        <property name="config">  
+            <bean class="com.google.code.kaptcha.util.Config">  
+                <constructor-arg>  
+                    <props>  
+                        <prop key="kaptcha.border">yes</prop>  
+                        <prop key="kaptcha.border.color">105,179,90</prop>  
+                        <prop key="kaptcha.textproducer.font.color">blue</prop>  
+                        <prop key="kaptcha.image.width">125</prop>  
+                        <prop key="kaptcha.image.height">60</prop>  
+                        <prop key="kaptcha.textproducer.font.size">45</prop>  
+                        <prop key="kaptcha.session.key">code</prop>  
+                        <prop key="kaptcha.textproducer.char.length">4</prop>  
+                        <prop key="kaptcha.textproducer.font.names">宋体,楷体,微软雅黑</prop>  
+                    </props>  
+                </constructor-arg>  
+            </bean>  
+        </property>  
+    </bean> 
+</beans>

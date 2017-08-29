@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd"
+  version="2.0">
+  <description>金国忠jsp的自定义函数标签</description>
+  <display-name>jgz functions</display-name>
+  <tlib-version>1.0</tlib-version>
+  <short-name>jgz</short-name><!-- prefix="jgz" -->
+  <uri></uri>
+  
+ <!-- ******************************Tag自定义标签********************** -->
+ 	 
+ 
+	 <tag>
+	 	<description>测试标签</description>
+	 	<name>cesi</name>
+	 	<tag-class>com.flat.srm.common.tag.TextTag</tag-class>
+	 	<body-content>JSP</body-content>
+	 	<attribute>
+	 		<name>var</name>
+	 		<required>true</required>
+	  		<rtexprvalue>true</rtexprvalue>
+	 	</attribute>
+	 </tag>
+	 
+	 <tag>
+	 	<description>角色查询标签</description>
+	 	<name>FindRoleTag</name>
+	 	<tag-class>com.flat.srm.common.tag.FindRoleTag</tag-class>
+	 	<body-content>JSP</body-content>
+	 	<attribute>
+	 		<name>roleId</name>
+	 		<required>true</required>
+	  		<rtexprvalue>true</rtexprvalue>
+	 	</attribute>
+	 </tag>
+ 
+	 
+	 <tag>
+	  	<description>查询遍历标签</description>
+	  	<name>contentList</name>
+	  	<tag-class>com.flat.srm.common.tag.ContentListTag</tag-class>
+	  	<body-content>JSP</body-content>
+	  	<attribute>
+	  		<name>var</name>
+	  		<required>false</required>
+	  		<rtexprvalue>false</rtexprvalue>
+	  	</attribute>
+	  	<attribute>
+	  		<name>isDelete</name>
+	  		<required>false</required>
+	  		<rtexprvalue>true</rtexprvalue>
+	  	</attribute>
+	  	<attribute>
+	  		<name>mark</name>
+	  		<required>false</required>
+	  		<rtexprvalue>true</rtexprvalue>
+	  	</attribute>
+	  	<attribute>
+	  		<name>channelId</name>
+	  		<required>true</required>
+	  		<rtexprvalue>true</rtexprvalue>
+	  	</attribute>
+	  	<attribute>
+	  		<name>pageSize</name>
+	  		<required>false</required>
+	  		<rtexprvalue>true</rtexprvalue>
+	  	</attribute>
+	  	<attribute>
+	  		<name>pageNo</name>
+	  		<required>false</required>
+	  		<rtexprvalue>true</rtexprvalue>
+	  	</attribute>
+	  	<attribute>
+	  		<name>keyword</name>
+	  		<required>false</required>
+	  		<rtexprvalue>true</rtexprvalue>
+	  	</attribute>
+	  </tag>
+ 	
+ 	<tag>
+	  	<!-- 标签说明 -->
+	  	<description>字母小写转换为大写</description>
+	  	<!-- 标签名称 -->
+	  	<name>UpperCase</name>
+	  	<!-- 标签对应的类 -->
+	  	<tag-class>com.flat.srm.common.tag.JgzTagCx</tag-class>
+		  	<!-- 
+	  		它决定标签的格式，（就是决定是否有标签体 ）
+	  		empty:没有标签体<tz:loop />
+	  		scriptless:你的标签体可以用EL表达式或者JSP的动作元素，但是不能用JSP脚本<%%>
+	  		JSP:可以支持JSP动作代表 解析El表达和JSP所有的动作部分
+	  		tagdependent:它忽略动作部分，打印纯文本
+	  	 -->
+	  	<body-content>scriptless</body-content>
+	  	<attribute>
+	  		<!-- 属性名称 -->
+	  		<name>conent</name>
+	  		<!-- 属性是否是必须，如果不写，会报错，默认false -->
+  			<required>true</required>
+  			<!-- 是否在运行期间支持el表达 默认是:false-->
+  			<rtexprvalue>true</rtexprvalue>
+	  	</attribute>
+  
+ 	 </tag>
+ 	 	
+ 	<tag>
+ 		<description>PermissionsTag权限过滤标签</description>
+ 		<name>PermissionsTag</name>
+ 		<tag-class>com.flat.srm.common.tag.PermissionsTag</tag-class>
+ 		<body-content>JSP</body-content>
+ 		<attribute>
+ 			<name>keyId</name>
+ 			<required>true</required>
+ 			<rtexprvalue>true</rtexprvalue>
+ 		</attribute>
+ 	</tag>
+  	
+	  	<tag>
+		 	<description>tzIf标签</description>
+		 	<name>if</name>
+		 	<tag-class>com.flat.srm.common.tag.TzIFTag</tag-class>
+		 	<body-content>JSP</body-content>
+		 	<attribute>
+		 		<name>test</name>
+		 		<required>true</required>
+		 		<rtexprvalue>true</rtexprvalue>
+		 	</attribute>
+ 		</tag>
+ 		
+ 		
+		 <tag>
+		 	<description>tzthen标签</description>
+		 	<name>then</name>
+		 	<tag-class>com.flat.srm.common.tag.TzThenTag</tag-class>
+		 	<body-content>JSP</body-content>
+		 </tag>
+ 
+	  <tag>
+	 	<description>tzelse标签</description>
+	 	<name>else</name>
+	 	<tag-class>com.flat.srm.common.tag.TzElseTag</tag-class>
+	 	<body-content>JSP</body-content><!--  -->
+	 </tag>
+  	
+	  
+  	
+  	
+  
+  <!--  *****************************函数自定义标签 **********************-->
+  <function>
+    <description>时间的格式化标签</description>
+    <name>formatDate</name>
+    <function-class>com.flat.srm.common.tag.JgzFunctions</function-class>
+    <function-signature>java.lang.String formatDate(java.util.Date,java.lang.String)</function-signature>
+    <example>
+      Name: ${jgz:formatDate(new Date(),"yyyy-MM-dd hh:mm:ss")}
+    </example>  
+  </function>
+  
+  <function>
+    <description>获取集合的长度</description>
+    <name>getLength</name>
+    <function-class>com.flat.srm.common.tag.JgzFunctions</function-class>
+    <function-signature>int getLength(java.util.Collection)</function-signature>
+    <example>
+      Name: ${jgz:getLength(集合)}
+    </example>  
+  </function>
+	
+   <function>
+    <description>获取时间并且转换成“几天前”的格式</description>
+    <name>getTimeFormat</name>
+    <function-class>com.flat.srm.common.tag.JgzFunctions</function-class>
+    <function-signature>java.lang.String getTimeFormat(java.util.Date)</function-signature>
+    <example>
+      Name: ${jgz:getTimeFormat(new date) }
+    </example>  
+  </function>
+  
+  	 <function>
+	    <description>获取数字并且转换中文格式</description>
+	    <name>getMany</name>
+	    <function-class>com.flat.srm.common.tag.JgzFunctions</function-class>
+	    <function-signature>java.lang.String getMany(java.lang.Double)</function-signature>
+	    <example>
+	      Name: ${jgz:getMany(double)}==125.11===壹佰贰拾伍元壹角壹分
+	    </example>  
+ 	 </function>
+
+
+	 <function>
+	    <description>获取12345...的数字来获取ABCD...</description>
+	    <name>getCharacter</name>
+	    <function-class>com.flat.srm.common.tag.JgzFunctions</function-class>
+	    <function-signature>java.lang.String getCharacter(int)</function-signature>
+	    <example>
+	      Name: ${jgz:getCharacter(int)}==1===A
+	    </example>  
+ 	 </function>
+ 	 
+ 	 <function>
+	    <description>获取数字并且转换中文格式，一、二、三...</description>
+	    <name>chinesCharacter</name>
+	    <function-class>com.flat.srm.common.tag.JgzFunctions</function-class>
+	    <function-signature>java.lang.String chinesCharacter(int)</function-signature>
+	    <example>
+	      Name: ${jgz:chinesCharacter(int)}==1===一
+	    </example>  
+ 	 </function>
+
+
+	<function>
+	    <description>获取IP地址计算出地址</description>
+	    <name>getIP</name>
+	    <function-class>com.flat.srm.common.tag.JgzFunctions</function-class>
+	    <function-signature>java.lang.String getIP(javax.servlet.http.HttpServletRequest)</function-signature>
+	    <example>
+	      Name: ${jgz:getIP(Request)}==ip地址===一
+	    </example>  
+ 	 </function>
+
+</taglib>

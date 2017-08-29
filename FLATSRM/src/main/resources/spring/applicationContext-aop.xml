@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+  http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+  http://www.springframework.org/schema/context
+  http://www.springframework.org/schema/context/spring-context-4.2.xsd
+  http://www.springframework.org/schema/aop
+  http://www.springframework.org/schema/aop/spring-aop-4.2.xsd 
+  http://www.springframework.org/schema/tx
+  http://www.springframework.org/schema/tx/spring-tx-4.2.xsd">
+	<!-- proxy-target-class属性，默认为false，表示使用jdk动态代理织入增强,true表示使用CGLib动态代理技术织入增强 -->
+	<aop:aspectj-autoproxy proxy-target-class="true"></aop:aspectj-autoproxy>
+    <bean class="com.flat.srm.common.core.aop.LogInterceptor"></bean>
+  	<bean class="com.flat.srm.common.core.aop.ThrowingInterceptor"></bean> 
+  	 
+  	 <!-- 配置切面    用XML的方式 切入-->
+<!--    <aop:config>-->
+<!--        <aop:aspect ref="log">-->
+<!--          <aop:before method="log1" pointcut="within(com.tanzhou.controller..*)"/>-->
+<!--          <aop:after method="log2"  pointcut="within(com.tanzhou.controller..*)"/>-->
+<!--          <aop:around method="log3" pointcut="within(com.tanzhou.controller..*)"/>-->
+<!--          <aop:after-throwing method="yichang" throwing="e" pointcut="within(com.tanzhou.controller..*)"/>-->
+<!--        </aop:aspect>-->
+<!--    </aop:config>-->
+</beans>

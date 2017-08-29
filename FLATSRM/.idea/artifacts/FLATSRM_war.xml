@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="FLATSRM:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <root id="archive" name="FLATSRM.war">
+      <element id="artifact" artifact-name="FLATSRM:war exploded" />
+    </root>
+  </artifact>
+</component>

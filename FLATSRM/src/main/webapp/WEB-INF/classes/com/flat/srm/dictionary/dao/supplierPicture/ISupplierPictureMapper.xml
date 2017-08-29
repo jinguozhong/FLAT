@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flat.srm.dictionary.dao.supplierPicture.ISupplierPictureMapper" >
+	 <!--供应商注册保持 -->
+	 <insert  id="save" useGeneratedKeys="true" keyProperty="id"  parameterType="SupplierPicture">
+	 	insert into
+		 srm_fileUpload
+			<trim prefix="(" suffix=")" suffixOverrides="," >
+				<if test="supplierId!='' and supplierId!=null">
+					supplierId,
+				</if>
+				<if test="supplierName!='' and supplierName!=null">
+					supplierName,
+				</if>
+				<if test="url!='' and url!=null">
+					url,
+				</if>
+				<if test="name!='' and name!=null">
+					name,
+				</if>
+				<if test="size!='' and size!=null">
+					size,
+				</if>
+				<if test="updateBy!='' and updateBy!=null">
+					updateBy,
+				</if>
+				<if test="newBy!='' and newBy!=null">
+					newBy,
+				</if>
+				<if test=" updateTime!=null">
+					updateTime,
+				</if>
+			</trim>
+			values
+			<trim prefix="(" suffix=")" suffixOverrides="," >
+				<if test="supplierId!='' and supplierId!=null">
+					#{supplierId},
+				</if>
+				<if test="supplierName!='' and supplierName!=null">
+					#{supplierName},
+				</if>
+				<if test="url!='' and url!=null">
+					#{url},
+				</if>
+				<if test="name!='' and name!=null">
+					#{name},
+				</if>
+				<if test="size!='' and size!=null">
+					#{size},
+				</if>
+				<if test="updateBy!='' and updateBy!=null">
+					#{updateBy},
+				</if>
+				<if test="newBy!='' and newBy!=null">
+					#{newBy},
+				</if>
+				<if test=" updateTime!=null">
+					#{updateTime},
+				</if>
+			</trim>	
+	 </insert>
+
+	<select id="find" resultType="SupplierPicture">
+		select id,updateBy,newBy,newTime,updateTime,supplierId,supplierName,url,name,size from srm_fileupload where name=#{0}
+
+	</select>
+
+
+</mapper>
+
+
+
+
+
+
+
+
+
+

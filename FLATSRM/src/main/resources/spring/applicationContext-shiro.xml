@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+  http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+  http://www.springframework.org/schema/context
+  http://www.springframework.org/schema/context/spring-context-4.2.xsd
+  http://www.springframework.org/schema/aop
+  http://www.springframework.org/schema/aop/spring-aop-4.2.xsd 
+  http://www.springframework.org/schema/tx
+  http://www.springframework.org/schema/tx/spring-tx-4.2.xsd">
+   	
+  	<bean id="sessionDAO" class="org.apache.shiro.session.mgt.eis.MemorySessionDAO"/>   
+  	<!-- 会话Session ID生成器 -->
+	 <!-- <bean id="sessionIdGenerator" class="org.apache.shiro.session.mgt.eis.JavaUuidSessionIdGenerator"/> -->
+     
+	 <!--配置shiro的过滤器工厂类，id- shiroFilter要和我们在web.xml中配置的过滤器一致 -->
+	 <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+	 	<property name="securityManager" ref="securityManager"></property>	
+	 	<!-- 登入地址允许访问 -->
+		  <property name="loginUrl" value = "/login"></property> 
+		<!--验证成功需要返回指定的地址  -->
+	    <property name="successUrl" value= "/admin/index"></property>
+	    <!-- <property name="unauthorizedUrl" value="/toError"></property> -->
+		<property name="filterChainDefinitions">
+			<value>
+				<!--静态资源的访问  -->
+				/resources/** = anon
+				<!-- /getLogout = logout --> 
+				/login =anon 
+				/submitLogin =anon   
+				/LodingfindRole =anon 
+				<!--/** = authc 代表所有的url必须经过认证才可以访问  --> 
+				<!-- /getLogin = authc -->
+				/admin/** = authc   
+				<!-- /admin/rollingLoadTest=perms[user:ddd] -->
+				<!--anon代表匿名记录过滤器 所有的url都是匿名访问地址  -->
+				 <!-- /** = anon  -->
+			</value>					
+		</property> 
+	    <property name="filters"> 
+	   	   <map>
+				<entry key ="authc" value-ref="loginFormAuthFilter"></entry>
+				<entry key="logout" value-ref="logoutFilter" />
+		   </map>
+	    </property>  
+	 </bean> 
+  	 <!--安全管理器 SecurityManager  -->
+ 	<bean id = "securityManager" class= "org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+ 		<property name="realm" ref = "userRealm"></property> 
+ 		<property name="cacheManager" ref = "cacheManager"></property>
+ 		<property name="sessionManager" ref = "sessionManager"></property> 
+ 	</bean> 
+ 	
+ 	<!--自定义realm  -->
+ 	<bean id="userRealm" class= "com.flat.srm.common.security.UserRealm"></bean>
+ 	
+ 	<!--定义缓存管理器 -->
+ 	<bean id ="cacheManager" class= "org.apache.shiro.cache.ehcache.EhCacheManager">
+ 		<property name="cacheManagerConfigFile" value="classpath:shiro/ehcache.xml"></property>
+ 	</bean>
+ 	<!-- 会话Cookie模板 -->
+ 	<bean id="sessionIdCookie" class="org.apache.shiro.web.servlet.SimpleCookie">
+ 		<constructor-arg value="sid"/>
+ 		<property name="httpOnly" value="true"/>
+ 		<property name="maxAge" value="180000"/>
+ 	</bean>
+ 	
+  
+ 		<!--定义sessionManager -->
+ 	<bean id = "sessionManager" class = "org.apache.shiro.web.session.mgt.DefaultWebSessionManager">
+ 		<!--session的失效时间  -->
+ 		<property name="globalSessionTimeout" value="1800000000"></property>
+ 		<property name="deleteInvalidSessions" value="true" />
+ 		<!-- 定时清理失效会话, 清理用户直接关闭浏览器造成的孤立会话   -->
+ 		<property name="sessionValidationSchedulerEnabled" value="true"/>
+ 		<!--定时清理失效的会话 -->
+ 		 <property name="sessionValidationInterval" value="180000"></property> 
+ 		<!-- session监听 -->
+ 		 <!--  <property name="sessionListeners" >
+ 		  	<list> 
+ 		  		<ref bean="sessionListener"/>
+ 		  	</list>
+ 		  </property>  -->
+ 		  <!-- 开启出入属性 -->
+ 	    <property name="sessionIdCookieEnabled" value="true"/> 
+ 		<!--session管理  -->
+ 		<property name="sessionDAO" ref="sessionDAO"/>
+ 		<property name="sessionIdCookie" ref="sessionIdCookie"/>
+ 	</bean>
+ 	
+ 	<!-- 自定义过滤器 -->
+ 	 <bean id="loginFormAuthFilter" class="com.flat.srm.common.security.filter.LoginFormAuthFilter"></bean> 
+ 	 
+ 	 <!-- 增加LogoutFilter并配置注销跳转url --> 
+ 	<bean id="logoutFilter" class="org.apache.shiro.web.filter.authc.LogoutFilter">
+     	<property name="redirectUrl" value="/login" />
+	</bean>
+	 
+	<!--session监听  -->
+	<bean id="sessionListener" class="com.flat.srm.common.security.listenter.CustomSessionListener"> </bean>
+	
+	<!-- <bean id="sessionDAO" class="com.jgz.security.session.CustomShiroSessionDAO">
+		 <property name="sessionIdGenerator" ref="sessionIdGenerator"/>
+	</bean> -->
+	 
+	 
+</beans>

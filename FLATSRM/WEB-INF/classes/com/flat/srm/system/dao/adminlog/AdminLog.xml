@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flat.srm.system.dao.adminlog.IAdminLogMapper" >
+	<select id="finds" resultType="AdminLog" parameterType="TzParams">
+		select classname,moethodname,time,username,newtime from adminlog 
+		<trim prefix="WHERE" prefixOverrides="AND | OR"> 
+			<if test="username!='' and username!=null">
+				and userName like'%${username}%'
+			</if>
+		</trim>
+		 ORDER BY newtime DESC
+		 LIMIT #{pageNo} ,#{pageSize}
+	</select>
+	
+	<select id="count" resultType="int" parameterType="TzParams" >
+		
+		select count(1) from adminlog 
+		<trim prefix="WHERE" prefixOverrides="AND | OR"> 
+				<if test="username!='' and username!=null">
+					and userName like'%${username}%'
+				</if>
+		</trim>
+	</select>
+	
+	<select id="findMaps" resultType="java.util.HashMap" parameterType="TzParams" >
+		  
+		select moethodname,count(1) as shuliang from  adminlog
+		<trim prefix="WHERE" prefixOverrides="AND | OR"> 
+		</trim>
+		GROUP BY moethodname ORDER BY count(1) DESC
+	</select>
+	
+	<insert id="save"  parameterType="AdminLog">
+			INSERT INTO adminlog( 
+				classname,
+				moethodname,
+				time,
+				userip,
+				userid,
+				username,
+				useripLocation
+			)VALUES( 
+				#{classname},
+				#{moethodname},
+				#{time},
+				#{userip},
+				#{userid},
+				#{username},
+				#{useripLocation}
+			)
+	</insert>
+	
+
+	
+	
+</mapper>

@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flat.srm.system.dao.permissions.IPermissionsMapper" >
+	<select id="finds" resultType="Permissions" parameterType="TzParams">
+		SELECT ID,CODE,NAME,PID,STATE,isParent FROM CP_PERMISSIONS
+		<trim prefix="WHERE" prefixOverrides="AND | OR"> 
+				<if test="id!=null and id!=''">
+					AND pid= #{id}
+				</if>
+				<if test="isParent!=null and isParent!=''">
+					and isParent = #{isParent}
+				</if> 
+		</trim>
+		ORDER BY code
+	</select> 
+	
+	<select id="find" resultType="Permissions" parameterType="TzParams">
+			SELECT
+			a.id,
+			a.name,
+			a.code,
+			a.isParent,
+			a.state,
+			a.newTime,
+			a.updateTime,
+			a.newBy,
+			a.updateBy, 
+			CONCAT(b.id,',',b.code,' ',b.NAME) as pname
+		FROM
+			CP_PERMISSIONS a
+		LEFT JOIN 
+			CP_PERMISSIONS b
+		ON a.pId=b.id
+		<trim prefix="WHERE" prefixOverrides="AND |OR ">
+			<if test="id!=null and id!=''">
+				or a.id =#{id}
+			</if> 
+			<if test="name!=null and name!=''">
+				or a.name like '%${name}%'
+			
+			</if>
+			<if test="code!=null and code!=''">
+				or   a.code = #{code}
+			 
+			</if>
+		</trim>
+		ORDER BY a.code
+	</select>
+	
+	<!-- <insert id="save" parameterType="Permissions"> 
+       <selectKey resultType="java.lang.Long" order="BEFORE"  keyProperty="id">
+       	SELECT CUSTOMER_ID_SEQ.NEXTVAL as id FROM DUAL
+       </selectKey> 
+		INSERT INTO CP_PERMISSIONS(ID,NAME,PID,CODE,ISPARENT,NEWBY)
+		values( #{id},#{name},#{pId},#{code},#{isParent},#{newBy}) 
+	</insert> --> 
+	<insert id="save" useGeneratedKeys="true" keyProperty="id" parameterType="Permissions">  
+		INSERT INTO CP_PERMISSIONS
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="name!='' and name!=null">
+				NAME,
+			</if>
+			<if test="pId!='' and pId!=null">
+				PID,
+			</if>
+			<if test="code!='' and code!=null">
+				CODE,
+			</if>
+			<if test="isParent!='' and isParent!=null">
+				ISPARENT,
+			</if>
+			<if test="newBy!='' and newBy!=null">
+				NEWBY,
+			</if>
+		</trim>
+		values
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="name!='' and name!=null">
+				#{name},
+			</if>
+			<if test="pId!='' and pId!=null">
+				#{pId},
+			</if>
+			<if test="code!='' and code!=null">
+				#{code},
+			</if>
+			<if test="isParent!='' and isParent!=null">
+				#{isParent},
+			</if>
+			<if test="newBy!='' and newBy!=null">
+				#{newBy},
+			</if>
+		</trim> 
+	</insert> 
+	
+	
+	
+	<update id="update" parameterType="Permissions" > 
+		UPDATE CP_PERMISSIONS SET 
+		<trim  suffixOverrides=",">
+			<if test="name!='' and name!=null">
+				name='${name}',
+			</if>
+			<if test="code!='' and code!=null">
+				code='${code}',
+			</if>
+			<if test="pId!='' and pId!=null">
+				pId=#{pId},
+			</if>
+			<if test="isParent!='' and isParent!=null">
+				isParent=#{isParent},
+			</if>
+			<if test="updateBy!='' and updateBy!=null">
+				updateBy=#{updateBy},
+			</if>
+			<if test="updateTime!=null">
+				UPDATETIME=#{updateTime} ,
+			</if>
+		</trim> 
+		where id=#{id}
+	
+	</update>
+	
+	 <update id="pNodeUpdate" parameterType="Permissions">
+		UPDATE CP_PERMISSIONS SET isParent='true' where id=#{pId}
+	</update>
+	<!-- 
+		<select id="findPermissionss" resultType="Permissions" parameterType="TzParams" >
+		 SELECT *
+		  FROM (SELECT A.*, rownum r
+		          FROM 
+		                (SELECT a.id,
+		                        a.NAME, 
+		                        a.pId,
+		                        a.CODE,
+		                        a.isParent,
+		                        a.state,
+		                        a.newtime,
+		                        a.updatetime,
+		                        b.code      as pcode,
+		                        b.name      as pname
+		                   FROM CP_PERMISSIONS a
+		                   LEFT JOIN CP_PERMISSIONS b
+		                     ON a.pId = b.id
+		                     <trim prefix="WHERE" prefixOverrides="AND | OR "> 
+								 <if test="@com.jgz.util.TmStringUtils@isNotEmpty(#{name})">
+									 a.name like '%${name}%' 
+								</if>
+							</trim> 
+		                  ORDER BY a.id DESC) A 
+		          <trim prefix="WHERE" prefixOverrides="AND | OR "> 
+					 <if test="@com.jgz.util.TmStringUtils@isNotEmpty(#{2})">
+						 #{pageSize}>=rownum
+					</if>
+				</trim>          
+		         ) B 
+		<trim prefix="WHERE" prefixOverrides="AND | OR "> 
+			 <if test="@com.jgz.util.TmStringUtils@isNotEmpty(#{1})"> 
+				 r > #{pageNo}
+			
+			 </if>  
+		</trim>
+	</select> -->
+	
+		<select id="findPermissionss" resultType="Permissions" parameterType="TzParams" >
+		 SELECT a.id,
+                   a.NAME, 
+                   a.pId,
+                   a.CODE,
+                   a.isParent,
+                   a.state,
+                   a.newtime,
+                   a.updatetime,
+                   b.code      as pcode,
+                   b.name      as pname
+              FROM CP_PERMISSIONS a
+              LEFT JOIN CP_PERMISSIONS b
+                ON a.pId = b.id
+             <trim prefix="WHERE" prefixOverrides="AND | OR ">  
+					<if test="name!=null and name!=''">
+						 AND a.name like '%${name}%'  
+					</if>
+					<if test="code!=null and code!=''">
+						AND a.code like '%${code}%' 
+					</if>
+			</trim> 
+             ORDER BY a.id DESC 
+             LIMIT #{pageNo} ,#{pageSize}
+	</select>
+	
+	<delete id="delete" parameterType="java.lang.Long">
+		DELETE from CP_PERMISSIONS where id=#{0}
+	</delete>
+</mapper>

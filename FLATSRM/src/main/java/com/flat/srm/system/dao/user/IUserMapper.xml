@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flat.srm.system.dao.user.IUserMapper">
+
+	<delete id="delete" parameterType="java.lang.Long">
+		DELETE from cp_user where id=#{0}
+	</delete>
+	
+	<!-- <select id="getLogin" resultType="User" parameterType="TzParams">
+		SELECT
+			id,name,mail
+		FROM
+			cp_user	where  mail='${mail}' and password='${password}'	
+	</select> -->
+	<select id="getLogin" resultType="User" >
+		SELECT
+			id,name,mail,password
+		FROM
+			cp_user	where  mail=#{0} and state=2
+	</select>
+	
+	<select id="findUser" resultType="User" parameterType="TzParams">
+			SELECT
+			a.id,
+			a.name,
+			a.mail,
+			a.isParent,
+			a.state,
+			a.newTime,
+			a.updateTime,
+			a.newBy,
+			a.updateBy,
+			a.note,
+			<!-- CONCAT(c.id,',',c.code,' ',c.name) as company, -->
+		    CONCAT(b.id,',',b.mail,' ',b.NAME) as pname
+		FROM
+			cp_user a
+		LEFT JOIN 
+			cp_user b
+		ON a.pId=b.id
+		<!-- LEFT JOIN
+			cp_company c
+	    ON a.companyId=c.id -->		
+		<trim prefix="WHERE" prefixOverrides="AND |OR ">
+			<if test="id!=null and id!=''">
+				or a.id =#{id}
+			</if> 
+			<if test="name!=null and name!=''">
+				or a.name like '%${name}%' 
+			</if>
+			<if test="code!=null and code!=''">
+				or   a.code = #{code} 
+			</if>
+			<if test="state==null and state==''">
+				and a.state=2
+			</if>
+			<if test="state!=null and state!=''">
+				and a.state=#{state}
+			</if>
+			
+		</trim>
+		ORDER BY a.mail 
+	</select> 
+	 
+	<select id="findUsers"  resultType="User" parameterType="TzParams" >
+		
+		select id,mail as code,name,pId,isParent from cp_user
+		<trim prefix="WHERE" prefixOverrides="AND | OR"> 
+				<if test="id!=null and id!=''">
+					AND pid= #{id}
+				</if>
+				<if test="isParent!=null and isParent!=''">
+					and isParent = #{isParent}
+				</if>
+				and state=2
+		</trim>
+		ORDER BY MAIL
+		 
+	</select>   
+	
+	<update id="update" parameterType="User" >  
+	<!-- 	UPDATE cp_user SET  
+		name='${name}', 
+		code='${code}', 
+		mail='${mail}', 
+		pId=#{pId}, 
+		isParent=#{isParent}, 
+		updateBy=#{updateBy},
+		updateTime=#{updateTime},company=#{company}, department=#{department},jobs=#{jobs}
+		where id=#{id} -->
+		UPDATE cp_user SET 
+		<trim  suffixOverrides="," >
+			<if test="name!='' and name!=null">
+					name='${name}',
+			</if>
+			<if test="code!='' and code!=null">
+					code='${code}',
+			</if>
+			<if test="mail!='' and mail!=null">
+					mail='${mail}', 
+			</if>
+			<if test="pId!='' and pId!=null">
+					pId=#{pId},
+			</if>
+			<if test="isParent!='' and isParent!=null">
+					isParent=#{isParent},
+			</if>
+			<if test="updateBy!='' and updateBy!=null">
+					updateBy=#{updateBy},
+			</if>
+			<if test="updateTime!=null">
+					updateTime=#{updateTime},
+			</if> 
+			<if test="companyId!='' and companyId!=null">
+					companyId=#{companyId},
+			</if> 
+			<if test="department!='' and department!=null">
+					department=#{department},
+			</if> 
+			<if test="state!='' and state!=null">
+					state=#{state},
+			</if> 
+		</trim>  
+		where id=#{id} 
+	</update>
+	
+	<update id="updeletePass" parameterType="User" >  
+		UPDATE cp_user SET  PASSWORD='${password}' where id=#{id}
+	
+	</update>
+	<update id="pNodeUpdate">
+		UPDATE cp_user SET isParent=#{0} where id=#{1}
+	</update>
+	
+<!-- 	<select id="getUsers" resultType="User" parameterType="TzParams" >
+		 SELECT *
+		  FROM (SELECT A.*, rownum r
+		          FROM 
+		                (SELECT a.id,
+		                        a.NAME,
+		                        a.mail,
+		                        a.pId,
+		                        a.CODE,
+		                        a.isParent,
+		                        a.state,
+		                        a.newTime,
+		                        a.updateTime,
+		                        b.code      as pcode,
+		                        b.name      as pname
+		                   FROM cp_user a
+		                   LEFT JOIN cp_user b
+		                     ON a.pId = b.id
+		                     <trim prefix="WHERE" prefixOverrides="AND | OR "> 
+								 <if test="name!=null and name!=''">
+									 AND a.name like '%${name}%'  
+								</if>
+								<if test="code!=null and code!=''">
+									AND a.code like '%${code}%' 
+								</if>
+							</trim> 
+		                  ORDER BY a.id DESC) A 
+		          <trim prefix="WHERE" prefixOverrides="AND | OR "> 
+					 <if test="pageSize!=null and pageSize!=''">
+						 #{pageSize}>=rownum
+					</if>
+				</trim>          
+		         ) B 
+		<trim prefix="WHERE" prefixOverrides="AND | OR "> 
+			   <if test="pageNo>=0 or (pageNo!=null and pageNo!='')"> 
+				 r > #{pageNo}
+			
+			 </if> 
+		</trim>
+	</select> -->
+	
+	<select id="getUsers" resultType="User" parameterType="TzParams" >
+		 SELECT a.id,
+                a.NAME,
+                a.mail,
+                a.pId,
+                a.mail as CODE,
+                a.isParent,
+                a.state,
+                a.newTime,
+                a.updateTime, 
+                b.name      as pname
+           FROM cp_user a
+           LEFT JOIN cp_user b
+             ON a.pId = b.id
+             <trim prefix="WHERE" prefixOverrides="AND | OR "> 
+				 <if test="name!=null and name!=''">
+					 AND a.name like '%${name}%'  
+				</if>
+				<if test="code!=null and code!=''">
+					AND a.mail like '%${code}%' 
+				</if>
+				and a.state=2
+			</trim> 
+          ORDER BY a.id DESC
+          LIMIT #{pageNo} ,#{pageSize}
+	</select>
+	
+	<select id="userRoles" resultType="java.util.HashMap" parameterType="java.lang.Integer">
+			SELECT
+			a.userid as userid,
+			a.roleid as id,
+			b. name as uname,
+			c.code as  code, 
+			c. name as  name
+		FROM
+			user_role a
+		JOIN cp_user b ON a.userid = b.id
+		JOIN cp_role c ON a.roleid = c.id	
+		<trim prefix="WHERE" prefixOverrides="AND | OR ">  
+			 and a.userid = #{0}  
+		</trim>
+	</select>
+	<!-- <insert id="save" parameterType="User"> 
+         <selectKey resultType="java.lang.Long" order="BEFORE"  keyProperty="id">
+         	SELECT CUSTOMER_ID_SEQ.NEXTVAL as id FROM DUAL
+         </selectKey> 
+		insert into cp_user(ID,NAME,MAIL,PID,CODE,ISPARENT,NEWBY)
+		values( #{id},'${name}','${mail}',#{pId},'${code}',#{isParent},#{newBy}) 
+	</insert>  -->
+	
+	<insert id="save" useGeneratedKeys="true" keyProperty="id"  parameterType="User">  
+		insert into 
+			cp_user 
+			<trim prefix="(" suffix=")" suffixOverrides="," >
+				<if test="name!='' and name!=null">
+					NAME,
+				</if>
+				<if test="mail!='' and mail!=null">
+					MAIL,
+				</if>
+				<if test="pId!='' and pId!=null">
+					PID,
+				</if>
+				<if test="code!='' and code!=null">
+					CODE,
+				</if>
+				<if test="isParent!='' and isParent!=null"> 
+					ISPARENT,
+				</if>
+				<if test="newBy!='' and newBy!=null"> 
+					NEWBY,
+				</if>
+				<if test="companyId!='' and companyId!=null"> 
+					COMPANYID,
+				</if>
+				<if test="department!='' and department!=null"> 
+					DEPARTMENT,
+				</if> 
+				<if test="password!='' and password!=null"> 
+					PASSWORD,
+				</if> 
+				<if test="state!='' and state!=null"> 
+					STATE,
+				</if>
+				<if test="note!='' and note!=null"> 
+					NOTE,
+				</if>
+			 </trim> 
+		 values
+			<trim prefix="(" suffix=")" suffixOverrides="," >
+				<if test="name!='' and name!=null">
+					'${name}',
+				</if>
+				<if test="mail!='' and mail!=null">
+					'${mail}',
+				</if>
+				<if test="pId!='' and pId!=null">
+					#{pId},
+				</if>
+				<if test="code!='' and code!=null">
+					'${code}',
+				</if>
+				<if test="isParent!='' and isParent!=null"> 
+					#{isParent},
+				</if>
+				<if test="newBy!='' and newBy!=null"> 
+					#{newBy},
+				</if>
+				<if test="companyId!='' and companyId!=null"> 
+					'${companyId}',
+				</if>
+				<if test="department!='' and department!=null"> 
+					'${department}',
+				</if> 
+				<if test="password!='' and password!=null"> 
+					'${password}',
+				</if>
+				<if test="state!='' and state!=null"> 
+					#{state},
+				</if>
+				<if test="note!='' and note!=null"> 
+					'${note}',
+				</if>
+			</trim> 
+	</insert> 
+	
+	<!-- 如何批量插入表中没有主键需要设置useGeneratedKeys="false" -->
+	<insert id="u_rSave" useGeneratedKeys="false">
+		 INSERT INTO user_role(userid,roleid) VALUES
+		  <foreach collection="param2" item="params" index="index" separator=","> 
+		 	  (#{param1},#{params.id}) 
+		 </foreach>
+		<!--  (SELECT A.* FROM (
+			 <foreach collection="param2" item="params" index="index" separator="UNION ALL">
+			 	 SELECT 
+			 	  #{param1},#{params.id}
+			 	 FROM DUAL
+			 </foreach>
+		 )A) -->
+	</insert>
+	
+	<delete id="u_rDelete" parameterType="java.lang.Long">
+		DELETE from user_role where userid=#{0}
+	</delete>
+	
+	<select id="findRegisteredUsers" resultType="User" parameterType="TzParams" >
+		 SELECT a.id,
+	            a.NAME,
+	            a.mail,
+	            a.note
+	       FROM cp_user a 
+	       where  a.state=1
+	      ORDER BY a.id DESC
+	      LIMIT #{pageNo} ,#{pageSize}
+	</select>
+	
+	<select id="findRegisteredUserTotal" resultType="java.lang.Integer" >
+		 SELECT count(1)
+	       FROM cp_user a 
+	       where  a.state=1 
+	</select>
+</mapper>

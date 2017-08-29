@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flat.srm.dictionary.dao.supplier.ISupplierMapper" >
+
+	<sql id="findSupplier">
+		id,pId,type,company,nature,industry,bank,bankAccount,legalPerson,legalPersonPhone,countries,province,state,updateBy,newBy,isParent,newTime,updateTime,
+		address,mail,userName,department,position,phone,production,quality
+	</sql>
+
+
+	 <!--供应商注册保持 -->
+	 <insert  id="save" useGeneratedKeys="true" keyProperty="id"  parameterType="Supplier">
+	 	insert into 
+			cp_supplier 
+			<trim prefix="(" suffix=")" suffixOverrides="," >
+				<if test="code!='' and code!=null">
+					code,
+				</if>
+				<if test="pId!='' and pId!=null">
+					pId,
+				</if>
+				<if test="state!='' and state!=null">
+					state,
+				</if>
+				<if test="updateBy!='' and updateBy!=null">
+					updateBy,
+				</if>
+				<if test="newBy!='' and newBy!=null">
+					newBy,
+				</if>
+				<if test="isParent!='' and isParent!=null">
+					isParent,
+				</if>
+				<if test="  newTime!=null">
+					newTime,
+				</if>
+				<if test="updateTime!=null">
+					updateTime,
+				</if>
+				<if test="type!='' and type!=null">
+					type,
+				</if>
+				<if test="company!='' and company!=null">
+					company,
+				</if>
+				<if test="nature!='' and nature!=null">
+					nature,
+				</if>
+				<if test="industry!='' and industry!=null">
+					industry,
+				</if>
+				<if test="bank!='' and bank!=null">
+					bank,
+				</if>
+				<if test="bankAccount!='' and bankAccount!=null">
+					bankAccount,
+				</if>
+				<if test="legalPerson!='' and legalPerson!=null">
+					legalPerson,
+				</if>
+				<if test="legalPersonPhone!='' and legalPersonPhone!=null">
+					legalPersonPhone,
+				</if>
+				<if test="countries!='' and countries!=null">
+					countries,
+				</if>
+				<if test="province!='' and province!=null">
+					province,
+				</if>
+				<if test="address!='' and address!=null">
+					address,
+				</if>
+				<if test="mail!='' and mail!=null">
+					mail,
+				</if>
+				<if test="userName!='' and userName!=null">
+					userName,
+				</if>
+				<if test="department!='' and department!=null">
+					department,
+				</if>
+				<if test="position!='' and position!=null">
+					position,
+				</if>
+				<if test="phone!='' and phone!=null">
+					phone,
+				</if>
+				<if test="production!='' and production!=null">
+					production,
+				</if>
+				<if test="quality!='' and quality!=null">
+					quality,
+				</if>
+			</trim>
+			values
+			<trim prefix="(" suffix=")" suffixOverrides="," >
+				<if test="code!='' and code!=null">
+					#{code},
+				</if>
+				<if test="pId!='' and pId!=null">
+					#{pId},
+				</if>
+				<if test="state!='' and state!=null">
+					#{state},
+				</if>
+				<if test="updateBy!='' and updateBy!=null">
+					#{updateBy},
+				</if>
+				<if test="newBy!='' and newBy!=null">
+					#{newBy},
+				</if>
+				<if test="isParent!='' and isParent!=null">
+					#{isParent},
+				</if>
+				<if test="  newTime!=null">
+					#{newTime},
+				</if>
+				<if test="updateTime!=null">
+					#{updateTime},
+				</if>
+				<if test="type!='' and type!=null">
+					#{type},
+				</if>
+				<if test="company!='' and company!=null">
+					#{company},
+				</if>
+				<if test="nature!='' and nature!=null">
+					#{nature},
+				</if>
+				<if test="industry!='' and industry!=null">
+					#{industry},
+				</if>
+				<if test="bank!='' and bank!=null">
+					#{bank},
+				</if>
+				<if test="bankAccount!='' and bankAccount!=null">
+					#{bankAccount},
+				</if>
+				<if test="legalPerson!='' and legalPerson!=null">
+					#{legalPerson},
+				</if>
+				<if test="legalPersonPhone!='' and legalPersonPhone!=null">
+					#{legalPersonPhone},
+				</if>
+				<if test="countries!='' and countries!=null">
+					#{countries},
+				</if>
+				<if test="province!='' and province!=null">
+					#{province},
+				</if>
+				<if test="address!='' and address!=null">
+					#{address},
+				</if>
+				<if test="mail!='' and mail!=null">
+					#{mail},
+				</if>
+				<if test="userName!='' and userName!=null">
+					#{userName},
+				</if>
+				<if test="department!='' and department!=null">
+					#{department},
+				</if>
+				<if test="position!='' and position!=null">
+					#{position},
+				</if>
+				<if test="phone!='' and phone!=null">
+					#{phone},
+				</if>
+				<if test="production!='' and production!=null">
+					#{production},
+				</if>
+				<if test="quality!='' and quality!=null">
+					#{quality},
+				</if>
+			</trim>	
+	 </insert>  
+	
+	
+	<!--未审核通过的供应商 信息查询-->
+	<select id="find" parameterType="TzParams" resultType="Supplier">
+		select <include refid="findSupplier"/> from cp_supplier
+		where state=#{state}
+		LIMIT #{pageNo},#{pageSize}
+	</select>
+
+	<!--未审核通过的供应商信息汇总统计-->
+	<select id="findTotal" parameterType="TzParams" resultType="java.lang.Integer">
+		select count(1) from cp_supplier
+		where state=#{state}
+	</select>
+</mapper>
